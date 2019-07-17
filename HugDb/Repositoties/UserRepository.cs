@@ -1,0 +1,66 @@
+﻿using HugDb.Entities;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace HugDb.Repositoties
+{
+    public class UserRepository
+    {
+        private HugDbContext _context;
+        public UserRepository(HugDbContext context)
+        {
+            _context = context;
+        }
+
+        public User GetUser(int id)
+        {
+            return _context.Users.Single(x => x.Id == id);
+        }
+
+        public User GetUserWithHugs(int id)
+        {
+            return _context.Users.Include(x => x.Hugs).Single(x => x.Id == id);
+        }
+
+        public List<User> GetAllUsers()
+        {
+            return _context.Users.Take(100).ToList();
+        }
+
+        public List<User> GetUserByName(string name)
+        {
+            var users = _context.Users.Where(x => x.FirstName.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+            var result = users.ToList();
+            return result;
+        }
+
+        public void Delete(int userId)
+        {
+            var user = _context.Users.Find(userId);
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+        }
+
+        public void Delete(User user)
+        {
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+        }
+
+        public void AddUser(User user)
+        {
+            _context.Users.Add(user);
+            _context.SaveChanges();
+        }
+
+        public void Update(User user)
+        {
+            _context.Users.Update(user);
+            _context.SaveChanges();
+        }
+
+    }
+}
